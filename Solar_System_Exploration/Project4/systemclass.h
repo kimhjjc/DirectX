@@ -7,7 +7,8 @@
 #include "graphicsclass.h"
 #include "fpsclass.h"
 #include "cpuclass.h"
-#include "timerclass.h"
+#include "timerclass.h"
+#include "soundclass.h"
 
 class SystemClass
 {
@@ -32,6 +33,12 @@ private:
 	FpsClass* m_Fps;
 	CpuClass* m_Cpu;
 	TimerClass* m_Timer;
+	SoundClass* m_Sound;
+	SoundClass* m_Booster;
+	SoundClass* m_Crash;
+private:
+	bool isBooster;
+	bool isCrash;
 };
 // Function prototypes
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

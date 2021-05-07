@@ -40,7 +40,9 @@ bool FontClass::LoadFontData(char* filename)
 {
 	ifstream fin;
 	int i;
-	char temp;	// Create the font spacing buffer.
+	char temp;
+
+	// Create the font spacing buffer.
 	m_Font = new FontType[95];
 	if (!m_Font)
 	{

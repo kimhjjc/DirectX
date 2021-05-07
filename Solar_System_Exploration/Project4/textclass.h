@@ -29,6 +29,8 @@ public:
 	bool SetEarthDistance(D3DXVECTOR3, ID3D11DeviceContext*);
 	bool SetShipSpeed(int, ID3D11DeviceContext*);
 	bool SetLife(int, ID3D11DeviceContext*);
+	bool SetObjectCount(int, ID3D11DeviceContext*);
+	bool SetScreenSize(ID3D11DeviceContext*);
 private:
 	bool InitializeSentence(SentenceType**, int, ID3D11Device*);
 	bool UpdateSentence(SentenceType*, char*, int, int, float, float, float, ID3D11DeviceContext*);
@@ -47,5 +49,7 @@ private:
 	SentenceType* m_sentence5;
 	SentenceType* m_sentence5_1;
 	SentenceType* m_sentence6;
+	SentenceType* m_sentence7;
+	SentenceType* m_sentence8;
 };
 #endif

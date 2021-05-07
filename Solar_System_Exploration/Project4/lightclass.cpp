@@ -46,6 +46,11 @@ void LightClass::SetSpecularSwitch(bool onoff)
 {
 	m_specularSwitch = onoff;
 }
+void LightClass::SetPosition(float x, float y, float z)
+{
+	m_position = D3DXVECTOR4(x, y, z, 1.0f);
+	return;
+}
 D3DXVECTOR4 LightClass::GetAmbientColor()
 {
 	return m_ambientColor;
@@ -62,6 +67,10 @@ D3DXVECTOR3 LightClass::GetDirection()
 D3DXVECTOR4 LightClass::GetSpecularColor()
 {
 	return m_specularColor;
+}
+D3DXVECTOR4 LightClass::GetPosition()
+{
+	return m_position;
 }
 float LightClass::GetSpecularPower()
 {

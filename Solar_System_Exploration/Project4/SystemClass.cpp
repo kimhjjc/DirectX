@@ -6,7 +6,14 @@ SystemClass::SystemClass()
 	m_Graphics = 0;
 	m_Fps = 0;
 	m_Cpu = 0;
-	m_Timer = 0;
+	m_Timer = 0;
+
+	m_Sound = 0;
+	m_Booster = 0;
+	m_Crash = 0;
+
+	isBooster = false;
+	isCrash = false;
 }
 
 SystemClass::SystemClass(const SystemClass& other)
@@ -76,11 +83,38 @@ bool SystemClass::Initialize()
 		MessageBox(m_hwnd, L"Could not initialize the Timer object.", L"Error", MB_OK);
 		return false;
 	}
+
+	m_Sound = new SoundClass;
+
+	result = m_Sound->Initialize(m_hwnd);
+
+	m_Booster = new SoundClass;
+
+	result = m_Booster->Initialize(m_hwnd);
+
+	m_Crash = new SoundClass;
+
+	result = m_Crash->Initialize(m_hwnd);
+
 	return true;
 }
 
 void SystemClass::Shutdown()
 {
+	if (m_Sound)
+	{
+		m_Sound->Shutdown();
+		delete m_Sound;
+		m_Sound = 0;
+	}
+
+	if (m_Booster)
+	{
+		m_Booster->Shutdown();
+		delete m_Booster;
+		m_Booster = 0;
+	}
+
 	// Release the graphics object.
 	if (m_Graphics)
 	{
@@ -149,6 +183,29 @@ void SystemClass::Run()
 				MessageBox(m_hwnd, L"Frame Processing Failed", L"Error", MB_OK);
 				done = true;
 			}
+
+			if (m_Input->IsLShiftPressed())
+			{
+				if (!isBooster)
+				{
+					m_Booster->PlayBoosterFile();
+				}
+
+				isBooster = true;
+
+			}
+
+			else
+			{
+				isBooster = false;
+			}
+
+			if (m_Graphics->m_Crash)
+			{
+				m_Crash->PlatCrashFile();
+
+				m_Graphics->m_Crash = false;
+			}
 		}
 		// Check if the user pressed escape and wants to quit.
 		if (m_Input->IsEscapePressed() == true)
@@ -166,52 +223,85 @@ bool SystemClass::Frame()
 	float mouselX, mouselY;
 	static float rotation = 0.0f;
 	static float inputTimer[3] = { 0.0f, };		// m_Timer->GetTime() 함수가 무조건 1초당 1000으로 변환
-	float shipSpeed = 0.0f;		// 1초에 움직일 거리
+	static float forwardShipSpeed = 0.0f;		// 1초에 앞으로 움직일 거리
+	static float rightShipSpeed = 0.0f;		// 1초에 옆으로 움직일 거리
+	float Acceleration = 100;
+	float Acceleration2 = 10;
+	float breakAcceleration = 0.5f;
 	float realSpeed = 0.0f;		// 1초당 실제 움직이는 속도 계산법 :  realSpeed = (shipSpeed * m_Timer->GetTime()) / 1000 
 	float SideMoveSpeed = 0.0f;	// 좌, 우로 움직이는 속도
 
-	
+
 	// Do the input frame processing.
 	result = m_Input->Frame();
 	if (!result)
 	{
 		return false;
 	}
+	// Update the system stats.
+	m_Timer->Frame();
+	m_Fps->Frame();
+	m_Cpu->Frame();
 
+	if (forwardShipSpeed > Acceleration * 3 || forwardShipSpeed < -Acceleration * 3 ||
+		rightShipSpeed >  Acceleration * 3 || rightShipSpeed < -Acceleration * 3)
+		breakAcceleration *= 10;
 
+	if (forwardShipSpeed >= 7.0f)
+		forwardShipSpeed -= Acceleration * Acceleration2 * breakAcceleration * m_Timer->GetTime() / 1000;
+	else if (forwardShipSpeed <= -7.0f)
+		forwardShipSpeed += Acceleration * Acceleration2 * breakAcceleration  * m_Timer->GetTime() / 1000;
+	else
+		forwardShipSpeed = 0;
+
+	if (rightShipSpeed >= 7.0f)
+		rightShipSpeed -= Acceleration * Acceleration2 * breakAcceleration  * m_Timer->GetTime()/ 1000;
+	else if (rightShipSpeed <= -7.0f)
+		rightShipSpeed += Acceleration * Acceleration2 * breakAcceleration  * m_Timer->GetTime()/ 1000;
+	else
+		rightShipSpeed = 0;
+
+	if (m_Input->IsLShiftPressed())
+	{
+		Acceleration *= 10.0f;
+	}
 	if (m_Input->IsWPressed())
 	{
-		//m_Graphics->MoveForward(realSpeed);
-		shipSpeed = 300.0f;
+		if (forwardShipSpeed < Acceleration * 3)
+			forwardShipSpeed += Acceleration * Acceleration2 * m_Timer->GetTime() / 1000;
+
+		if (forwardShipSpeed > Acceleration * 3)
+			forwardShipSpeed = Acceleration * 3;
 	}
 	if (m_Input->IsSPressed())
 	{
-		//m_Graphics->MoveForward(-realSpeed);
-		shipSpeed = -300.0f;
+		if (forwardShipSpeed > -Acceleration * 3)
+			forwardShipSpeed -= Acceleration * Acceleration2 * m_Timer->GetTime() / 1000;
+
+		if (forwardShipSpeed < -Acceleration * 3)
+			forwardShipSpeed = -Acceleration * 3;
 	}
-	if (m_Input->IsLShiftPressed())
-	{
-		shipSpeed *= 10.0f;
-	}
-	if (m_Input->IsWPressed() || m_Input->IsSPressed())
-		realSpeed = (shipSpeed * m_Timer->GetTime()) / 1000;
+
+	realSpeed = (forwardShipSpeed * m_Timer->GetTime()) / 1000;
 
 	if (m_Input->IsAPressed())
 	{
-		//m_Graphics->StrafeRight(-realSpeed);
-		shipSpeed = -300.0f;
+		if (rightShipSpeed > -Acceleration * 3)
+			rightShipSpeed -= Acceleration * Acceleration2 * m_Timer->GetTime() / 1000;
+
+		if (rightShipSpeed < -Acceleration * 3)
+			rightShipSpeed = -Acceleration * 3;
 	}
 	if (m_Input->IsDPressed())
 	{
-		//m_Graphics->StrafeRight(realSpeed);
-		shipSpeed = 300.0f;
+		if (rightShipSpeed < Acceleration * 3)
+			rightShipSpeed += Acceleration * Acceleration2 * m_Timer->GetTime() / 1000;
+
+		if (rightShipSpeed > Acceleration * 3)
+			rightShipSpeed = Acceleration * 3;
 	}
-	if (m_Input->IsLShiftPressed())
-	{
-		shipSpeed *= 10.0f;
-	}
-	if (m_Input->IsAPressed() || m_Input->IsDPressed())
-		SideMoveSpeed = (shipSpeed * m_Timer->GetTime()) / 1000;
+
+	SideMoveSpeed = (rightShipSpeed * m_Timer->GetTime()) / 1000;
 
 	if (realSpeed != 0.0f)
 	{
@@ -233,12 +323,9 @@ bool SystemClass::Frame()
 	{
 		m_Graphics->MouseMove(mouselX, mouselY, 0.3f);
 	}
-	// Update the system stats.
-	m_Timer->Frame();
-	m_Fps->Frame();
-	m_Cpu->Frame();
+
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame(m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), shipSpeed, m_Timer->GetTime());
+	result = m_Graphics->Frame(m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), forwardShipSpeed, rightShipSpeed, m_Timer->GetTime());
 	if (!result)
 	{
 		return false;

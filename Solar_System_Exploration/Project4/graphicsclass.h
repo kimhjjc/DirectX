@@ -9,6 +9,10 @@
 #include "lightclass.h"
 #include "bitmapclass.h"
 #include "textclass.h"
+#include "FireModelClass.h"
+#include "fireshaderclass.h"
+#include <time.h>
+#include "PointClass.h"
 
 // Globals
 const bool FULL_SCREEN = false;
@@ -25,7 +29,7 @@ public:
 	~GraphicsClass();
 	bool Initialize(int, int, HWND);
 	void Shutdown();
-	bool Frame(int, int, float, float);
+	bool Frame(int, int, float, float, float);
 	D3DClass* Get_m_D3D() { return m_D3D; }
 	TextureShaderClass* Get_m_TextureShader() { return m_TextureShader; }
 	LightClass* Get_m_Light() { return m_Light; }
@@ -40,6 +44,14 @@ private:
 	float sceneColor[4];
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
+
+	PointClass *m_PointLight;
+	LightClass *m_SunPoint1;
+	LightClass *m_SunPoint2;
+	LightClass *m_SunPoint3;
+	LightClass *m_SunPoint4;
+	LightClass *m_SunPoint5;
+	FireShaderClass* m_FireShader;
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
@@ -50,5 +62,13 @@ private:
 	TextClass* m_Text;
 	D3DXVECTOR3 m_EarthDistance;
 	int m_Speed, m_Life;
+	FireModelClass *m_FireModel;
+	float frametime;
+	bool m_Alive;
+	float player_RightRotation;
+	D3DXVECTOR3 *m_smallPlanetScale, *m_smallPlanetPosition, *m_smallPlanetRotation, *m_smallPlanetPosition_Power, *m_smallPlanetRotation_Power;
+	int m_firstSmallPlanet;
+public:
+	bool m_Crash;
 };
 #endif

@@ -1,4 +1,5 @@
 #include "modelclass.h"
+#include "FireModelClass.h"
 
 ModelClass::ModelClass()
 {
@@ -254,7 +255,7 @@ bool ModelClass::LoadDataStructures(char* filename, int filenumber)
 				fin >> vertices[vertexIndex].position.x >> vertices[vertexIndex].position.y >>
 					vertices[vertexIndex].position.z;
 				// Invert the Z vertex to change to left hand system.
-				if(filenumber != 10)
+				if(filenumber != 11)
 				vertices[vertexIndex].position.z = vertices[vertexIndex].position.z * -1.0f;
 				vertexIndex++;
 			}
@@ -263,7 +264,7 @@ bool ModelClass::LoadDataStructures(char* filename, int filenumber)
 			{
 				fin >> texcoords[texcoordIndex].texture.x >> texcoords[texcoordIndex].texture.y;
 				// Invert the V texture coordinates to left hand system.
-				if (filenumber != 10)
+				if (filenumber != 11)
 				texcoords[texcoordIndex].texture.y = 1.0f - texcoords[texcoordIndex].texture.y;
 				texcoordIndex++;
 			}
@@ -273,7 +274,7 @@ bool ModelClass::LoadDataStructures(char* filename, int filenumber)
 				fin >> normals[normalIndex].normal.x >> normals[normalIndex].normal.y >>
 					normals[normalIndex].normal.z;
 				// Invert the Z normal to change to left hand system.
-				if (filenumber != 10)
+				if (filenumber != 11)
 				normals[normalIndex].normal.z = normals[normalIndex].normal.z * -1.0f;
 				normalIndex++;
 			}

@@ -12,6 +12,8 @@ TextClass::TextClass()
 	m_sentence5 = 0;
 	m_sentence5_1 = 0;
 	m_sentence6 = 0;
+	m_sentence7 = 0;
+	m_sentence8 = 0;
 }
 TextClass::TextClass(const TextClass& other)
 {
@@ -163,6 +165,28 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 	{
 		return false;
 	}
+	result = InitializeSentence(&m_sentence7, 32, device);
+	if (!result)
+	{
+		return false;
+	}
+	// Now update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence7, (char*)"Object Count", 100, 600, 1.0f, 0.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+	result = InitializeSentence(&m_sentence8, 32, device);
+	if (!result)
+	{
+		return false;
+	}
+	// Now update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence8, (char*)"Screen Size", 100, 600, 1.0f, 0.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
 	return true;
 }
 void TextClass::Shutdown()
@@ -183,6 +207,10 @@ void TextClass::Shutdown()
 	ReleaseSentence(&m_sentence5_1);
 	// Release the second sentence.
 	ReleaseSentence(&m_sentence6);
+	// Release the second sentence.
+	ReleaseSentence(&m_sentence7);
+	// Release the second sentence.
+	ReleaseSentence(&m_sentence8);
 	// Release the font shader object.
 	if (m_FontShader)
 	{
@@ -241,6 +269,16 @@ bool TextClass::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatri
 		return false;
 	}
 	result = RenderSentence(deviceContext, m_sentence6, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+	result = RenderSentence(deviceContext, m_sentence7, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+	result = RenderSentence(deviceContext, m_sentence8, worldMatrix, orthoMatrix);
 	if (!result)
 	{
 		return false;
@@ -549,14 +587,14 @@ bool TextClass::SetEarthDistance(D3DXVECTOR3 earthDistance, ID3D11DeviceContext*
 bool TextClass::SetShipSpeed(int shipSpeed, ID3D11DeviceContext* deviceContext)
 {
 	char tempString[32];
-	char distanceString1[32];	// 속도 설명글
-	char distanceString2[32];	// 실제 속도
+	char ShipSpeedString1[32];	// 속도 설명글
+	char ShipSpeedString2[32];	// 실제 속도
 	bool result;
 
 	// Setup the cpu string.
-	strcpy_s(distanceString1, "Ship Speed: ");
+	strcpy_s(ShipSpeedString1, "Ship Speed: ");
 
-	result = UpdateSentence(m_sentence5, distanceString1, m_screenWidth - 150, m_screenHeight - 80, 1.0f, 1.0f, 0.0f, deviceContext);
+	result = UpdateSentence(m_sentence5, ShipSpeedString1, m_screenWidth - 150, m_screenHeight - 80, 1.0f, 1.0f, 0.0f, deviceContext);
 	if (!result)
 	{
 		return false;
@@ -567,11 +605,11 @@ bool TextClass::SetShipSpeed(int shipSpeed, ID3D11DeviceContext* deviceContext)
 		shipSpeed = -shipSpeed;
 	_itoa_s(shipSpeed, tempString, 10);
 	// Setup the cpu string.
-	strcpy_s(distanceString2, tempString);
-	strcat_s(distanceString2, "  (10000 km / s)");
+	strcpy_s(ShipSpeedString2, tempString);
+	strcat_s(ShipSpeedString2, "  (10000 km / s)");
 
 
-	result = UpdateSentence(m_sentence5_1, distanceString2, m_screenWidth - 140, m_screenHeight - 60, 1.0f, 1.0f, 0.0f, deviceContext);
+	result = UpdateSentence(m_sentence5_1, ShipSpeedString2, m_screenWidth - 140, m_screenHeight - 60, 1.0f, 1.0f, 0.0f, deviceContext);
 	if (!result)
 	{
 		return false;
@@ -582,16 +620,16 @@ bool TextClass::SetShipSpeed(int shipSpeed, ID3D11DeviceContext* deviceContext)
 bool TextClass::SetLife(int life, ID3D11DeviceContext* deviceContext)
 {
 	char tempString[32];
-	char distanceString[32];
+	char LifeString[32];
 	float red, green, blue;
 	bool result;
 
 	// Convert the cpu integer to string format.
 	_itoa_s(life, tempString, 10);
 	// Setup the cpu string.
-	strcpy_s(distanceString, "Spaceship durability: ");
-	strcat_s(distanceString, tempString);
-	strcat_s(distanceString, " %");
+	strcpy_s(LifeString, "Spaceship durability: ");
+	strcat_s(LifeString, tempString);
+	strcat_s(LifeString, " %");
 
 	// If fps is 60 or above set the fps color to green.
 	if (life >= 60)
@@ -616,12 +654,56 @@ bool TextClass::SetLife(int life, ID3D11DeviceContext* deviceContext)
 	}
 
 
-	result = UpdateSentence(m_sentence6, distanceString, m_screenWidth / 2 - 50, 10, red, green, blue, deviceContext);
+	result = UpdateSentence(m_sentence6, LifeString, m_screenWidth / 2 - 50, 10, red, green, blue, deviceContext);
 	if (!result)
 	{
 		return false;
 	}
 
+
+	return true;
+}
+
+bool TextClass::SetObjectCount(int objectCount, ID3D11DeviceContext* deviceContext)
+{
+	char tempString[32];
+	char ObjectCountString[32];
+	bool result;
+	// Convert the cpu integer to string format.
+	_itoa_s(objectCount, tempString, 10);
+	// Setup the cpu string.
+	strcpy_s(ObjectCountString, "ObjectCouont : ");
+	strcat_s(ObjectCountString, tempString);
+
+	result = UpdateSentence(m_sentence7, ObjectCountString, 20, 80, 1.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TextClass::SetScreenSize(ID3D11DeviceContext* deviceContext)
+{
+	char tempString[32];
+	char ScreenString[32];
+	bool result;
+	// Convert the cpu integer to string format.
+	_itoa_s(m_screenWidth, tempString, 10);
+	// Setup the cpu string.
+	strcpy_s(ScreenString, "Screen Size : ");
+	strcat_s(ScreenString, tempString);
+
+	_itoa_s(m_screenHeight, tempString, 10);
+	strcat_s(ScreenString, " x ");
+	strcat_s(ScreenString, tempString);
+
+	result = UpdateSentence(m_sentence8, ScreenString, 20, 100, 1.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
 
 	return true;
 }

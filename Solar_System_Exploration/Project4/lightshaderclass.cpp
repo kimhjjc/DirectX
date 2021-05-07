@@ -1,4 +1,5 @@
-#include "lightshaderclass.h"
+#include "lightshaderclass.h"
+
 
 LightShaderClass::LightShaderClass()
 {
@@ -8,12 +9,14 @@ LightShaderClass::LightShaderClass()
 	m_matrixBuffer = 0;
 	m_cameraBuffer = 0;
 	m_lightBuffer = 0;
-	m_sampleState = 0;
+	m_sampleState = 0;
+
 }
 LightShaderClass::LightShaderClass(const LightShaderClass& other)
 {
 }
-LightShaderClass::~LightShaderClass()
+LightShaderClass::~LightShaderClass()
+
 {
 }
 

@@ -42,13 +42,13 @@ public:
 	bool LoadModel(char*);
 	void ReleaseModel();
 
-
 private:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 	bool LoadTexture(ID3D11Device*, WCHAR*);
 	void ReleaseTexture();
+
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

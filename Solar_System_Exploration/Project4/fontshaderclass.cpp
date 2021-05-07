@@ -276,7 +276,8 @@ void FontShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hw
 
 bool FontShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
 	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture,
-	D3DXVECTOR4 pixelColor){
+	D3DXVECTOR4 pixelColor)
+{
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	ConstantBufferType* dataPtr;
